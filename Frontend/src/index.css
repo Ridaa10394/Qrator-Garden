@@ -2,54 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Cozy Pixel Garden Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
-    /* Pixel art color palette */
-    --background: 95 25% 95%;
-    --foreground: 120 40% 15%;
+    /* Garden-inspired background palette */
+    --background: 45 15% 97%;
+    --foreground: 150 20% 15%;
 
-    --card: 120 30% 92%;
-    --card-foreground: 120 40% 15%;
+    /* Card system with organic feel */
+    --card: 120 25% 96%;
+    --card-foreground: 150 20% 15%;
 
-    --popover: 120 30% 92%;
-    --popover-foreground: 120 40% 15%;
+    /* Popover with natural tones */
+    --popover: 120 25% 98%;
+    --popover-foreground: 150 20% 15%;
 
-    /* Vibrant pixel green */
-    --primary: 120 80% 35%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: Deep forest green */
+    --primary: 150 40% 25%;
+    --primary-foreground: 120 25% 98%;
 
-    /* Pixel sage */
-    --secondary: 120 40% 75%;
-    --secondary-foreground: 120 40% 20%;
+    /* Secondary: Sage green */
+    --secondary: 120 20% 85%;
+    --secondary-foreground: 150 30% 20%;
 
-    /* Muted pixel tones */
-    --muted: 120 20% 85%;
-    --muted-foreground: 120 30% 40%;
+    /* Muted: Soft moss */
+    --muted: 115 15% 88%;
+    --muted-foreground: 150 15% 45%;
 
-    /* Bright pixel accent */
-    --accent: 60 100% 70%;
-    --accent-foreground: 120 40% 15%;
+    /* Accent: Fresh sprout green */
+    --accent: 120 35% 75%;
+    --accent-foreground: 150 30% 20%;
 
-    --destructive: 0 100% 60%;
-    --destructive-foreground: 0 0% 100%;
+    /* Destructive: Autumn red */
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 120 25% 98%;
 
-    --border: 120 30% 70%;
-    --input: 120 20% 88%;
-    --ring: 120 80% 35%;
+    /* Border: Gentle earth tone */
+    --border: 115 12% 82%;
+    --input: 115 12% 82%;
+    --ring: 150 40% 25%;
 
-    /* Pixel garden colors - more saturated */
-    --seed: 45 100% 50%;
-    --sprout: 100 80% 40%;
-    --growing: 120 80% 35%;
-    --blooming: 300 80% 60%;
-    
-    /* Isometric shadows and highlights */
-    --iso-shadow: 120 40% 60%;
-    --iso-highlight: 120 40% 90%;
-    --pixel-border: 2px;
-    
-    --radius: 0px; /* Sharp pixel edges */
+    /* Garden growth stages */
+    --seed: 60 45% 75%;
+    --sprout: 90 50% 65%;
+    --sapling: 120 45% 55%;
+    --bloom: 140 50% 45%;
+    --harvest: 160 45% 35%;
+
+    /* Gradients */
+    --gradient-garden: linear-gradient(135deg, hsl(120 35% 75%), hsl(150 40% 65%));
+    --gradient-growth: linear-gradient(90deg, hsl(60 45% 75%), hsl(160 45% 35%));
+    --gradient-earth: linear-gradient(180deg, hsl(45 25% 92%), hsl(120 25% 96%));
+
+    /* Shadows */
+    --shadow-soft: 0 2px 8px hsl(150 20% 15% / 0.1);
+    --shadow-medium: 0 4px 16px hsl(150 20% 15% / 0.15);
+    --shadow-strong: 0 8px 32px hsl(150 20% 15% / 0.2);
+
+    /* Pixel-inspired radius */
+    --radius: 8px;
 
     --sidebar-background: 0 0% 98%;
 
@@ -69,43 +81,33 @@
   }
 
   .dark {
-    /* Dark pixel art theme */
-    --background: 240 20% 12%;
-    --foreground: 120 40% 85%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 240 15% 18%;
-    --card-foreground: 120 40% 85%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 240 15% 18%;
-    --popover-foreground: 120 40% 85%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 120 70% 50%;
-    --primary-foreground: 240 20% 12%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 240 10% 25%;
-    --secondary-foreground: 120 40% 80%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 15% 20%;
-    --muted-foreground: 120 20% 60%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 60 90% 55%;
-    --accent-foreground: 240 20% 12%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 80% 55%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 240 15% 30%;
-    --input: 240 15% 22%;
-    --ring: 120 70% 50%;
-
-    /* Dark pixel garden colors */
-    --seed: 45 90% 45%;
-    --sprout: 100 70% 35%;
-    --growing: 120 70% 50%;
-    --blooming: 300 70% 55%;
-    
-    --iso-shadow: 240 20% 8%;
-    --iso-highlight: 240 10% 35%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -115,82 +117,15 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+}
+
+@layer base {
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground;
-    background: 
-      radial-gradient(circle at 20% 50%, hsl(var(--primary)) 2px, transparent 2px),
-      radial-gradient(circle at 80% 50%, hsl(var(--accent)) 1px, transparent 1px),
-      hsl(var(--background));
-    background-size: 60px 60px, 40px 40px, 100% 100%;
-    font-family: 'Courier New', monospace;
-    image-rendering: pixelated;
-  }
-  
-  /* Pixel art isometric effects */
-  .iso-block {
-    position: relative;
-    transform-style: preserve-3d;
-  }
-  
-  .iso-block::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: hsl(var(--iso-highlight));
-    transform: skewX(-45deg);
-    z-index: 1;
-  }
-  
-  .iso-block::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: -4px;
-    bottom: 0;
-    width: 4px;
-    background: hsl(var(--iso-shadow));
-    transform: skewY(-45deg);
-    z-index: 1;
-  }
-  
-  /* Pixel animations */
-  @keyframes pixel-bounce {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-4px); }
-  }
-  
-  @keyframes pixel-glow {
-    0%, 100% { 
-      box-shadow: 0 0 0 hsl(var(--primary));
-    }
-    50% { 
-      box-shadow: 
-        0 0 0 2px hsl(var(--primary)),
-        0 0 0 4px hsl(var(--primary) / 0.5),
-        0 0 0 6px hsl(var(--primary) / 0.2);
-    }
-  }
-  
-  .pixel-bounce {
-    animation: pixel-bounce 2s ease-in-out infinite;
-  }
-  
-  .pixel-glow {
-    animation: pixel-glow 2s ease-in-out infinite;
-  }
-  
-  /* Sharp pixel borders */
-  .pixel-border {
-    border: var(--pixel-border) solid hsl(var(--border));
-    box-shadow: 
-      inset 0 0 0 1px hsl(var(--iso-highlight)),
-      inset 0 0 0 2px hsl(var(--iso-shadow));
   }
 }
+

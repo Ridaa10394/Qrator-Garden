@@ -1,162 +1,96 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
-import { Sparkles, Target, TrendingUp, Users, Zap, Calendar } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Leaf, Sprout, Calendar, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
+
 
 const Landing = () => {
   return (
-    <div
-      className="min-h-screen p-6"
-      style={{
-        background: `
-          repeating-linear-gradient(
-            90deg,
-            hsl(var(--muted)) 0px,
-            hsl(var(--muted)) 1px,
-            transparent 1px,
-            transparent 20px
-          ),
-          repeating-linear-gradient(
-            0deg,
-            hsl(var(--muted)) 0px,
-            hsl(var(--muted)) 1px,
-            transparent 1px,
-            transparent 20px
-          ),
-          hsl(var(--background))
-        `
-      }}
-    >
-      <div className="max-w-6xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="iso-block bg-card border-4 border-border p-8 mb-8 inline-block">
-            <div className="pixel-glow">
-              <h1 className="text-6xl font-bold mb-4 uppercase tracking-wider text-primary">
-                QRATOR GARDEN 🌱
+    <div className="min-h-screen bg-gradient-earth">
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="flex items-center gap-2 mb-6">
+              <Sprout className="w-8 h-8 text-primary" />
+              <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-garden bg-clip-text text-transparent">
+                Pixel Garden
               </h1>
             </div>
-            <p className="text-xl font-bold uppercase tracking-wide text-muted-foreground mb-6">
-              GROW YOUR CONTENT EMPIRE
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              Nurture your content ideas from seed to harvest in your own cozy digital garden. 
+              Plan, grow, and cultivate amazing content with the magic of pixel-perfect organization.
             </p>
-            <p className="text-lg max-w-2xl mx-auto leading-relaxed">
-              Transform your content ideas into thriving digital assets. Plant seeds, nurture sprouts, 
-              and watch your content bloom from concept to publication in our gamified content garden.
-            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link to="/login">
+                <Button size="lg" className="w-full sm:w-auto shadow-medium hover:shadow-strong transition-all">
+                  <Leaf className="w-5 h-5 mr-2" />
+                  Start Growing
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto shadow-soft">
+                  Plant Your Garden
+                </Button>
+              </Link>
+            </div>
           </div>
-
-          <div className="flex gap-4 justify-center mb-12">
-            <Link to="/signup">
-              <Button 
-                size="lg"
-                className="bg-primary hover:bg-primary/80 text-primary-foreground border-4 border-border font-bold uppercase tracking-wide h-14 px-8 transition-colors  pixel-bounce"
-              >
-                🌱 PLANT
-              </Button>
-            </Link>
-            <Link to="/login">
-              <Button 
-                variant="outline"
-                size="lg"
-                className="bg-secondary hover:bg-secondary/80 text-secondary-foreground border-4 border-border font-bold uppercase tracking-wide h-14 px-8 transition-colors "
-              >
-                🚪 LOGIN
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 justify-items-center">
-          <Card className="w-full max-w-sm iso-block bg-card border-4 border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-primary border-2 border-border flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <h3 className="font-bold uppercase tracking-wide">IDEA TO BLOOM</h3>
+          <div className="relative">
+            <img 
+              
+              alt="Cozy pixel garden with sprouting plants and cottage"
+              className="rounded-2xl shadow-strong w-full h-auto"
+            />
+            <div className="absolute -top-4 -right-4 bg-gradient-garden rounded-full p-6 shadow-medium">
+              <Calendar className="w-8 h-8 text-primary-foreground" />
             </div>
-            <p className="text-muted-foreground">
-              Transform raw ideas into polished content through our 4-stage growth system: 
-              Seed → Sprout → Growing → Blooming
-            </p>
-          </Card>
-
-          <Card className="w-full max-w-sm iso-block bg-card border-4 border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-growing border-2 border-border flex items-center justify-center">
-                <Target className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-bold uppercase tracking-wide">TRACK PROGRESS</h3>
-            </div>
-            <p className="text-muted-foreground">
-              Monitor your content journey with visual progress indicators and celebrate 
-              milestones as your garden flourishes.
-            </p>
-          </Card>
-
-          <Card className="w-full max-w-sm iso-block bg-card border-4 border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-accent border-2 border-border flex items-center justify-center">
-                <TrendingUp className="h-6 w-6 text-accent-foreground" />
-              </div>
-              <h3 className="font-bold uppercase tracking-wide">BUILD STREAKS</h3>
-            </div>
-            <p className="text-muted-foreground">
-              Maintain daily habits with streak tracking and gamified progression 
-              to keep your content creation momentum.
-            </p>
-          </Card>
-
-          <div className="md:col-span-2 lg:col-span-3 flex justify-center gap-6">
-            <Card className="w-full max-w-sm iso-block bg-card border-4 border-border p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-sprout border-2 border-border flex items-center justify-center">
-                  <Zap className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="font-bold uppercase tracking-wide">CONTENT TYPES</h3>
-              </div>
-              <p className="text-muted-foreground">
-                Organize ideas, scripts, SEO content, and published pieces in one 
-                unified digital garden ecosystem.
-              </p>
-            </Card>
-
-            <Card className="w-full max-w-sm iso-block bg-card border-4 border-border p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-secondary border-2 border-border flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-secondary-foreground" />
-                </div>
-                <h3 className="font-bold uppercase tracking-wide">DAILY GOALS</h3>
-              </div>
-              <p className="text-muted-foreground">
-                Set and achieve daily content goals with personalized tasks 
-                tailored to your garden's growth stage.
-              </p>
-            </Card>
           </div>
         </div>
+      </section>
 
-        {/* CTA Section */}
-        <div className="text-center">
-          <Card className="iso-block bg-card border-4 border-border p-8 inline-block">
-            <h2 className="text-3xl font-bold uppercase tracking-wide mb-4">
-              Ready to Grow Your Content Garden?
-            </h2>
-            <p className="text-lg mb-6 max-w-md">
-              Join creators who've already planted over 10,000 content seeds and watched them bloom.
+      {/* Features */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-foreground mb-4">
+            Everything You Need to Grow Great Content
+          </h2>
+          <p className="text-muted-foreground text-lg">
+            From tiny seeds of ideas to fully bloomed masterpieces
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card className="p-8 shadow-soft hover:shadow-medium transition-all border-0 bg-card/50 backdrop-blur">
+            <div className="bg-growth-seed rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <Calendar className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-4">Content Calendar</h3>
+            <p className="text-muted-foreground">
+              Plant your ideas in the perfect season. Organize and schedule your content with our intuitive calendar system.
             </p>
-            <Link to="/signup">
-              <Button 
-                size="lg"
-                className="bg-primary hover:bg-primary/80 text-primary-foreground border-4 border-border font-bold uppercase tracking-wide h-14 px-8 transition-colors pixel-glow"
-              >
-                🌱 GET STARTED
-              </Button>
-            </Link>
+          </Card>
+
+          <Card className="p-8 shadow-soft hover:shadow-medium transition-all border-0 bg-card/50 backdrop-blur">
+            <div className="bg-growth-sprout rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <Sprout className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-4">Growth Tracking</h3>
+            <p className="text-muted-foreground">
+              Watch your ideas grow through 5 stages: Idea → Script → Video → Editing → SEO. Each step brings you closer to harvest.
+            </p>
+          </Card>
+
+          <Card className="p-8 shadow-soft hover:shadow-medium transition-all border-0 bg-card/50 backdrop-blur">
+            <div className="bg-growth-bloom rounded-full w-16 h-16 flex items-center justify-center mb-6">
+              <BarChart3 className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-4">AI Assistance</h3>
+            <p className="text-muted-foreground">
+              Get help generating ideas, scripts, and SEO strategies. Let AI be your gardening assistant in the creative process.
+            </p>
           </Card>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
