@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Sprout, Mail, Lock, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { logIn } from "@/apiCalls/authCalls.js";
 
 
 const Login = () => {
@@ -15,20 +16,35 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
+    const user = {
+      email,
+      password
+    }
+
     // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const data = await logIn(user);
       toast({
         title: "Welcome back to your garden! 🌱",
         description: "Ready to nurture some amazing content today?",
       });
-      navigate("/home");
-    }, 1500);
+      navigate("/garden");
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: error.message || error || "Invalid credentials",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+ 
 
   return (
     <div className="min-h-screen bg-gradient-earth flex items-center justify-center p-4">

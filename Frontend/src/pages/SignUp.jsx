@@ -6,32 +6,43 @@ import { Label } from "@/components/ui/label";
 import { Sprout, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-
+import { signUp } from "@/apiCalls/authCalls.js";
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    
-
     setIsLoading(true);
 
+    const user ={
+      name,
+      email,
+      password
+
+    }
+
     // Simulate signup process
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const data = await signUp(user);
       toast({
-        title: "Welcome to Pixel Garden! 🌱",
-        description: "Your cozy content creation space is ready to bloom.",
+        title: "Welcome back to your garden! 🌱",
+        description: "Now please log in to start nurturing your amazing content.",
       });
-      navigate("/garden");
-    }, 2000);
+      navigate("/login");
+    } catch (error) {
+      toast({
+        title: "SignUp failed",
+        description: error.message || error || "Invalid credentials",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
