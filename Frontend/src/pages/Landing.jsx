@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Leaf, Sprout, Calendar, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
+import garden from "../assets/garden1.jpeg"
 
 
 const Landing = () => {
@@ -37,7 +38,7 @@ const Landing = () => {
           </div>
           <div className="relative">
             <img 
-              
+              src={garden}
               alt="Cozy pixel garden with sprouting plants and cottage"
               className="rounded-2xl shadow-strong w-full h-auto"
             />

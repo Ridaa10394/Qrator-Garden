@@ -7,6 +7,7 @@ import SignUp from './pages/SignUp'
 import Login from './pages/Login'
 import Landing from './pages/Landing'
 import Garden from './pages/Garden'
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/garden" element={<Garden />} />
+      <Route path="/profile" element={<Profile />} />
 
     </Routes>
     </TooltipProvider>
