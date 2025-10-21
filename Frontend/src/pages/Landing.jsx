@@ -15,7 +15,7 @@ const Landing = () => {
             <div className="flex items-center gap-2 mb-6">
               <Sprout className="w-8 h-8 text-primary" />
               <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-garden bg-clip-text text-transparent">
-                Pixel Garden
+                Qrator Garden
               </h1>
             </div>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">

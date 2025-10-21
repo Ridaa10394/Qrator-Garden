@@ -8,6 +8,11 @@ import Login from './pages/Login'
 import Landing from './pages/Landing'
 import Garden from './pages/Garden'
 import Profile from './pages/Profile';
+import GenerateIdeas from './pages/GenerateIdeas';
+import GenerateScripts from './pages/GenerateScripts';
+import GenerateSEO from './pages/GenerateSEO';
+import SavedDashboard from './pages/SavedDashboard';
+
 
 function App() {
   return (
@@ -20,6 +25,11 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/garden" element={<Garden />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/generate-ideas" element={<GenerateIdeas/>}/>
+      <Route path="/generate-script" element={<GenerateScripts/>}/>
+      <Route path="/generate-seo" element={<GenerateSEO/>}/>
+      <Route path="/saved-dashboard" element={<SavedDashboard/>}/>
+
 
     </Routes>
     </TooltipProvider>

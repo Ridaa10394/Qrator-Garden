@@ -8,7 +8,7 @@ const Navigation = () => {
   const location = useLocation();
 
   const navItems = [
-    { path: "/home", label: "Home", icon: Home },
+    { path: "/garden", label: "Home", icon: Home },
     { path: "/generate-ideas", label: "Ideas", icon: Lightbulb },
     { path: "/generate-script", label: "Script", icon: FileText },
     { path: "/generate-seo", label: "SEO", icon: Search },
