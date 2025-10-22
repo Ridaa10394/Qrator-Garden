@@ -1,11 +1,16 @@
 import express from 'express';
 import dotenv from 'dotenv';
+
+// Load environment variables before importing other modules
+dotenv.config();
+
+
 import connectDB from './config/dbconnection.js';
 import authRouter from './routes/auth.routes.js';
 import userRouter from './routes/user.routes.js';
 import cookieparser from 'cookie-parser';
 import cors from 'cors';
-dotenv.config();
+import Idearouter from './routes/idea.routes.js';
 
 const app = express();
 const PORT = 8000;
@@ -25,6 +30,7 @@ app.use(cors({
 //Routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use("/api/ideas",Idearouter)
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Lightbulb, Sparkles, RefreshCw, Copy, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { createIdea,generateIdeas } from "@/apiCalls/ideaAPI";
 
 const GenerateIdeas = () => {
   const { toast } = useToast();
@@ -15,7 +16,7 @@ const GenerateIdeas = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedIdeas, setGeneratedIdeas] = useState([]);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!topic.trim()) {
       toast({
         title: "Topic required 🌱",
@@ -26,53 +27,50 @@ const GenerateIdeas = () => {
     }
 
     setIsGenerating(true);
-
-    setTimeout(() => {
-      const ideas = [
-        `"${topic} Fundamentals: A Complete Beginner's Guide" - Start with the basics and build up foundational knowledge`,
-        `"5 Common ${topic} Mistakes (And How to Avoid Them)" - Help your audience sidestep typical pitfalls`,
-        `"${topic} vs. Alternative: Which is Better?" - Compare different approaches or tools in your niche`,
-        `"My ${topic} Journey: What I Learned in 30 Days" - Share personal experience and growth`,
-        `"${topic} Tools & Resources: My Current Stack" - Review and recommend helpful tools`,
-        `"Advanced ${topic} Techniques for ${audience || "Creators"}" - Dive deep into expert-level strategies`,
-      ];
-
+    try {
+      const ideas = await generateIdeas(topic, audience);
       setGeneratedIdeas(ideas);
-      setIsGenerating(false);
-
       toast({
         title: "Ideas bloomed! 🌸",
         description: "Fresh content ideas are ready for planting.",
       });
-    }, 2000);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Failed to generate ideas",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyIdea = (idea) => {
-    navigator.clipboard.writeText(idea);
+    navigator.clipboard.writeText(idea.description || idea.title);
     toast({
       title: "Copied to clipboard! 📋",
       description: "Idea copied and ready to plant in your garden.",
     });
   };
 
-  const saveIdea = (idea) => {
-    const saved = JSON.parse(localStorage.getItem("pixelGardenSaved") || "[]");
-    const newItem = {
-      id: Date.now().toString(),
-      type: "idea",
-      title: idea.split('"')[1] || idea.substring(0, 50) + "...",
-      content: idea,
-      createdAt: new Date().toISOString(),
-    };
+  const saveIdea = async (idea) => {
+    try {
+      // Save to backend DB
+      await createIdea(idea);
 
-    saved.push(newItem);
-    localStorage.setItem("pixelGardenSaved", JSON.stringify(saved));
-
-    toast({
-      title: "Idea saved! 💾",
-      description: "Added to your saved dashboard.",
-    });
-  };
+      toast({
+        title: "Idea saved! 💾",
+        description: "Added to your saved dashboard.",
+      });
+    } catch (err) {
+      toast({
+        title: "Idea already exists ⚠️",
+        description: err.message || "This idea is already in your dashboard.",
+        variant: "destructive",
+      });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-earth">
