@@ -16,6 +16,7 @@ import ScriptRouter from './routes/script.route.js';
 import calendarRouter from './routes/calendar.routes.js';
 import savedRouter from './routes/saved.routes.js';
 import ProfileRouter from './routes/profile.routes.js';
+import debugRouter from './routes/debug.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -26,11 +27,15 @@ connectDB();
 //middleware
 app.use(express.json());
 app.use(cookieparser());
+// Allow the frontend origin (set FRONTEND_URL in production .env). Default to local dev origin.
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 app.use(cors({
-  origin: 'https://qrator-garden.netlify.app',
+
+
+  origin: FRONTEND_URL,
+
   credentials: true
-}
-))
+}))
 
 //Routes
 app.use('/api/auth', authRouter);
@@ -39,9 +44,9 @@ app.use("/api/ideas",Idearouter);
 app.use('/api/seo', SEORouter);
 app.use("/api/script",ScriptRouter);
 app.use("/api/calendar",calendarRouter);
-app.use("/api/saved",savedRouter);
-app.use("/api/profile",ProfileRouter);
-
+app.use('/api/saved',savedRouter);
+app.use('/api/profile',ProfileRouter);
+app.use('/api/debug', debugRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -50,4 +55,7 @@ app.get('/', (req, res) => {
 //start server
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`);
+
 });
+
+

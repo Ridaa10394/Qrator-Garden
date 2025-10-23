@@ -32,11 +32,23 @@ export const signup = async (req, res) => {
     
     //Generate Token and cookie
     const token = await genToken(newUser._id);
-    res.cookie("token",token,{
-      httpOnly:true,
-      sameSite:true,
-      maxAge: 30*24*60*60*1000,
-    })
+    // Set cookie options. For cross-site cookies (frontend hosted on different domain) use SameSite=None and secure=true in production.
+    const cookieOptions = {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    };
+    if (process.env.NODE_ENV === 'production') {
+      cookieOptions.sameSite = 'none';
+      cookieOptions.secure = true; // requires HTTPS
+    } else {
+      cookieOptions.sameSite = 'lax';
+    }
+
+    res.cookie("token", token, cookieOptions);
+    // Optionally expose token in JSON response for clients that cannot receive cookies (set EXPOSE_TOKEN=true in env)
+    if (process.env.EXPOSE_TOKEN === 'true') {
+      return res.status(201).json({ message: "User created successfully", user: newUser, token });
+    }
     return res.status(201).json({ message: "User created successfully", user: newUser });
 
   } catch (error) {
@@ -67,12 +79,24 @@ export const login = async (req, res) => {
     }
     //Generate Token and cookie
     const token = await genToken(user._id);
-    res.cookie("token",token,{
-      httpOnly:true,
-      sameSite:true,
-      maxAge: 30*24*60*60*1000,
-    })
-    res.status(200).json({user})
+    const cookieOptions2 = {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    };
+    if (process.env.NODE_ENV === 'production') {
+      cookieOptions2.sameSite = 'none';
+      cookieOptions2.secure = true;
+    } else {
+      cookieOptions2.sameSite = 'lax';
+    }
+
+    res.cookie("token", token, cookieOptions2);
+    // Optionally expose token in JSON response for clients that cannot receive cookies (set EXPOSE_TOKEN=true in env)
+    if (process.env.EXPOSE_TOKEN === 'true') {
+      return res.status(200).json({ user, token });
+    }
+
+    res.status(200).json({ user });
 
   } catch (error) {
     console.error(error); // Add this line for debugging

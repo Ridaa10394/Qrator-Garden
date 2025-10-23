@@ -1,7 +1,8 @@
 // src/context/AuthContext.jsx
 
 import React, { createContext, useState, useEffect } from 'react';
-import { logIn } from '@/apiCalls/authCalls'; // Import your login function
+import { logIn, getCurrentUser } from '@/apiCalls/authCalls'; // Import your login and session check
+import axios from 'axios';
 
 export const AuthContext = createContext();
 
@@ -19,10 +20,28 @@ export const AuthProvider = ({ children }) => {
     // we would check the backend/cookie here in useEffect to confirm auth status.
     // For this example, we start authenticated after a successful login API call.
     useEffect(() => {
-        // Assume initial check is fast or done by the backend on first load.
-        // If a cookie exists and is valid, the user is authenticated.
-        // Since we can't check the cookie, we default to false and set to true on successful login.
-        setIsLoading(false); 
+        // On mount, try to confirm existing session by calling the backend.
+        // This should return the current user if the cookie is present and valid.
+        const checkSession = async () => {
+            try {
+                const res = await getCurrentUser();
+                if (res && res.user) {
+                    setUser(res.user);
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                    setUser(null);
+                }
+            } catch (err) {
+                // Not authenticated
+                setIsAuthenticated(false);
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        checkSession();
     }, []);
 
 
@@ -30,11 +49,24 @@ export const AuthProvider = ({ children }) => {
         try {
             setIsLoading(true);
             const response = await logIn(credentials);
-            
-            // Assuming successful response means the backend set the cookie and authorized the user.
-            setIsAuthenticated(true);
-            setUser(response.user); // Store user details if provided by the backend
-            
+
+            // If server exposed a token in the response (EXPOSE_TOKEN=true), use it as a fallback
+            if (response && response.token) {
+                // Store token in memory and set default Authorization header for axios
+                axios.defaults.headers.common['Authorization'] = `Bearer ${response.token}`;
+            }
+
+            // If server returned user, set authenticated state
+            if (response && response.user) {
+                setIsAuthenticated(true);
+                setUser(response.user);
+            } else {
+                // If no explicit user returned but a token is present, consider authenticated
+                if (response && response.token) {
+                    setIsAuthenticated(true);
+                }
+            }
+
             return response;
         } catch (error) {
             setIsAuthenticated(false);

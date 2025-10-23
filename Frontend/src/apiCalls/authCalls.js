@@ -26,3 +26,13 @@ export const logIn = async (userData) =>{
         throw error.response ? error.response.data : error.message;
     }       
 }
+
+// Get current authenticated user (uses cookie or Authorization header)
+export const getCurrentUser = async () => {
+    try {
+        const response = await axiosy.get('/api/user/current');
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : error.message;
+    }
+}
