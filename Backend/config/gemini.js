@@ -81,43 +81,6 @@ Make it engaging, conversational, and optimized for ${contentType}. Include spec
     }
 };
 
-// Generate SEO content using Gemini
-export const generateSEOWithGemini = async (contentTitle, platform, targetKeywords, contentDescription) => {
-    try {
-        const genAI = getGeminiClient();
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        
-        const prompt = `You are an SEO expert specializing in ${platform} content optimization. Create comprehensive SEO content for: "${contentTitle}"
-
-Platform: ${platform}
-${targetKeywords ? `Target Keywords: ${targetKeywords}` : ''}
-${contentDescription ? `Content Description: ${contentDescription}` : ''}
-
-Provide the following in a structured format:
-
-1. OPTIMIZED_TITLE: One highly optimized title for maximum reach
-2. TITLE_ALTERNATIVES: 3 alternative title options
-3. DESCRIPTION: A compelling 150-160 character meta description
-4. PRIMARY_KEYWORDS: 5-7 primary keywords (comma-separated)
-5. RELATED_KEYWORDS: 10 related keywords (comma-separated)
-6. HASHTAGS: 8-10 relevant hashtags for ${platform} (space-separated, with # symbol)
-
-Make all content optimized specifically for ${platform}'s algorithm and audience.`;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-        
-        // Parse the SEO response
-        const seoData = parseSEOFromText(text, contentTitle);
-        
-        return seoData;
-    } catch (error) {
-        console.error("Error generating SEO with Gemini:", error);
-        throw new Error(error?.message || "Failed to generate SEO content");
-    }
-};
-
 // Helper function to parse ideas from Gemini response
 function parseIdeasFromText(text) {
     const ideas = [];
@@ -174,58 +137,94 @@ function parseIdeasFromText(text) {
         });
     }
     
-    return ideas.slice(0, 3); // Ensure we return exactly 5 ideas
+    return ideas.slice(0, 5); // Ensure we return exactly 5 ideas
 }
+export const generateSEOWithGemini = async (
+  contentTitle,
+  platform,
+  targetKeywords,
+  contentDescription
+) => {
+  try {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-// Helper function to parse SEO data from Gemini response
-function parseSEOFromText(text, originalTitle) {
-    const seoData = {
-        optimizedTitle: originalTitle,
-        titleAlternatives: [],
-        description: '',
-        primaryKeywords: [],
-        relatedKeywords: [],
-        hashtags: []
-    };
-    
-    const lines = text.split('\n');
-    
-    for (let line of lines) {
-        line = line.trim();
-        
-        if (line.match(/OPTIMIZED_TITLE:/i)) {
-            seoData.optimizedTitle = line.replace(/OPTIMIZED_TITLE:\s*/i, '').replace(/"/g, '');
-        }
-        else if (line.match(/TITLE_ALTERNATIVES:/i)) {
-            const alts = line.replace(/TITLE_ALTERNATIVES:\s*/i, '');
-            seoData.titleAlternatives = alts.split(/[,\n]/).map(t => t.trim().replace(/^\d+\.\s*/, '').replace(/"/g, '')).filter(t => t);
-        }
-        else if (line.match(/DESCRIPTION:/i)) {
-            seoData.description = line.replace(/DESCRIPTION:\s*/i, '').replace(/"/g, '');
-        }
-        else if (line.match(/PRIMARY_KEYWORDS:/i)) {
-            const keywords = line.replace(/PRIMARY_KEYWORDS:\s*/i, '');
-            seoData.primaryKeywords = keywords.split(',').map(k => k.trim()).filter(k => k);
-        }
-        else if (line.match(/RELATED_KEYWORDS:/i)) {
-            const keywords = line.replace(/RELATED_KEYWORDS:\s*/i, '');
-            seoData.relatedKeywords = keywords.split(',').map(k => k.trim()).filter(k => k);
-        }
-        else if (line.match(/HASHTAGS:/i)) {
-            const tags = line.replace(/HASHTAGS:\s*/i, '');
-            seoData.hashtags = tags.split(/[\s,]+/).map(h => {
-                h = h.trim();
-                return h.startsWith('#') ? h : `#${h}`;
-            }).filter(h => h !== '#');
-        }
-    }
-    
-    // Fallback to ensure we have data
-    if (!seoData.description) {
-        seoData.description = `Discover everything about ${originalTitle}. Learn tips, tricks, and best practices.`;
-    }
-    
-    return seoData;
-}
+    const prompt = `
+You are an SEO strategist for ${platform}.
+Generate optimized SEO data for: "${contentTitle}"
+${targetKeywords ? `Target keywords: ${targetKeywords}` : ""}
+${contentDescription ? `Description: ${contentDescription}` : ""}
 
-export default { generateIdeasWithGemini, generateScriptWithGemini, generateSEOWithGemini };
+Respond in **strict JSON** format with:
+{
+  "title": {
+    "optimized": "Optimized Title",
+    "alternatives": ["Alt Title 1", "Alt Title 2", "Alt Title 3"]
+  },
+  "description": "Brief SEO description",
+  "keywords": {
+    "primary": ["keyword1", "keyword2", "keyword3"],
+    "related": ["related1", "related2"]
+  },
+  "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
+}`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.warn("Gemini returned non-JSON response. Raw text:", text);
+      return {
+        title: { optimized: contentTitle, alternatives: [] },
+        description:
+          contentDescription ||
+          `SEO content for ${contentTitle} on ${platform}.`,
+        keywords: {
+          primary: targetKeywords ? targetKeywords.split(",") : [],
+          related: [],
+        },
+        hashtags: text.match(/#\w+/g) || [],
+      };
+    }
+  } catch (error) {
+    console.error("Error generating SEO with Gemini:", error);
+    throw new Error(error?.message || "Failed to generate SEO content");
+  }
+};
+
+// ✅ Generate hashtags-only
+export const generateHashtagsWithGemini = async (
+  contentTitle,
+  platform,
+  targetKeywords
+) => {
+  try {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    const prompt = `
+Generate 10 trending and SEO-optimized hashtags for ${platform} based on:
+Title: "${contentTitle}"
+${targetKeywords ? `Keywords: ${targetKeywords}` : ""}
+Return hashtags as a JSON array of strings.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    try {
+      const hashtags = JSON.parse(text);
+      if (Array.isArray(hashtags)) return hashtags;
+      return text.match(/#\w+/g) || [];
+    } catch (e) {
+      return text.match(/#\w+/g) || [];
+    }
+  } catch (error) {
+    console.error("Error generating hashtags with Gemini:", error);
+    throw new Error(error?.message || "Failed to generate hashtags");
+  }
+};
+export default { generateIdeasWithGemini, generateScriptWithGemini, generateSEOWithGemini ,generateHashtagsWithGemini};

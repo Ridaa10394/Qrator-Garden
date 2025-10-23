@@ -12,15 +12,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import {
-  Search,
-  Target,
-  RefreshCw,
-  Save,
-  TrendingUp,
-} from "lucide-react";
+import { Search, Target, RefreshCw, Save, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+// Import the new API functions (path points to apiCalls folder)
+import {
+  generateSEO as generateSEOAPI,
+  saveSEO as saveSEOAPI,
+} from "@/apiCalls/seoAPI";
+
+// Utility function to safely parse the SEO data object
+const parseSeoData = (dataString) => {
+  try {
+    if (typeof dataString === "string") {
+      return JSON.parse(dataString);
+    }
+    return dataString; // Return as is if it's already an object (e.g., in testing)
+  } catch (e) {
+    console.error("Failed to parse SEO JSON:", e);
+    // Return a structure that prevents the component from crashing
+    return {
+      title: {},
+      description: "",
+      keywords: { primary: [], related: [] },
+      hashtags: [],
+    };
+  }
+};
 
 const GenerateSEO = () => {
   const { toast } = useToast();
@@ -30,8 +48,10 @@ const GenerateSEO = () => {
   const [contentDescription, setContentDescription] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [seoData, setSeoData] = useState(null);
+  // State to hold input data used for the generated SEO (for saving metadata)
+  const [generatedMetadata, setGeneratedMetadata] = useState(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!contentTitle.trim() || !platform) {
       toast({
         title: "Details needed 🌱",
@@ -43,52 +63,79 @@ const GenerateSEO = () => {
     }
 
     setIsGenerating(true);
+    setSeoData(null); // Clear previous output
+    setGeneratedMetadata(null);
 
-    setTimeout(() => {
-      const seoRecommendations = {
-        title: {
-          optimized: `${contentTitle} | Complete Guide 2024`,
-          alternatives: [
-            `How to ${contentTitle}: Step-by-Step Tutorial`,
-            `${contentTitle} Explained: Everything You Need to Know`,
-            `Master ${contentTitle}: Pro Tips & Tricks`,
-          ],
-        },
-        description: `Learn ${contentTitle.toLowerCase()} with this comprehensive guide. Discover proven techniques, avoid common mistakes, and master the fundamentals. Perfect for beginners and professionals alike. Updated for 2024.`,
-        keywords: {
-          primary: targetKeywords
-            .split(",")
-            .map((k) => k.trim())
-            .filter((k) => k),
-          related: [
-            `${contentTitle.toLowerCase()} tutorial`,
-            `${contentTitle.toLowerCase()} guide`,
-            `${contentTitle.toLowerCase()} tips`,
-            `${contentTitle.toLowerCase()} for beginners`,
-            `best ${contentTitle.toLowerCase()} practices`,
-            `${contentTitle.toLowerCase()} mistakes`,
-          ],
-        },
-        hashtags: [
-          `#${contentTitle.replace(/\s+/g, "")}`,
-          "#ContentCreator",
-          "#Tutorial",
-          "#LearnWithMe",
-          "#SkillBuilding",
-          "#CreativeProcess",
-          "#Educational",
-          "#HowTo",
-        ],
-      };
+    try {
+      // 1. Call the backend API to generate the SEO data
+      const data = await generateSEOAPI(
+        contentTitle,
+        platform,
+        targetKeywords,
+        contentDescription
+      );
 
-      setSeoData(seoRecommendations);
-      setIsGenerating(false);
+      // Normalize possible response shapes:
+      // - backend may return an array of hashtags
+      // - backend may return an object { generatedSEOData: {...} } or the object itself
+      // - backend may return a JSON string
+      let parsedData = null;
+
+      if (Array.isArray(data)) {
+        // If the backend returned hashtags array only, map into seoData.hashtags
+        parsedData = {
+          title: { optimized: "" },
+          description: "",
+          keywords: { primary: [], related: [] },
+          hashtags: data,
+        };
+      } else if (typeof data === "string") {
+        parsedData = parseSeoData(data);
+      } else if (data && typeof data === "object") {
+        // Try common shapes
+        if (data.generatedSEOData) {
+          parsedData =
+            typeof data.generatedSEOData === "string"
+              ? parseSeoData(data.generatedSEOData)
+              : data.generatedSEOData;
+        } else {
+          parsedData = data;
+        }
+      } else {
+        parsedData = {
+          title: { optimized: "" },
+          description: "",
+          keywords: { primary: [], related: [] },
+          hashtags: [],
+        };
+      }
+
+      setSeoData(parsedData);
+
+      // Save metadata related to this generation
+      setGeneratedMetadata({
+        platform,
+        targetKeywords: targetKeywords
+          .split(",")
+          .map((k) => k.trim())
+          .filter((k) => k),
+      });
 
       toast({
         title: "SEO strategy ready! 🎯",
         description: "Your content optimization recommendations are ready.",
       });
-    }, 2500);
+    } catch (error) {
+      console.error("SEO Generation Error:", error);
+      toast({
+        title: "Generation Failed 🛑",
+        description:
+          error?.message || "Could not generate SEO data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyToClipboard = (text, type) => {
@@ -99,27 +146,36 @@ const GenerateSEO = () => {
     });
   };
 
-  const saveSEO = () => {
-    const saved = JSON.parse(localStorage.getItem("pixelGardenSaved") || "[]");
-    const seoContent = `Title: ${seoData.title.optimized}\n\nDescription: ${seoData.description}\n\nKeywords: ${seoData.keywords.primary.join(
-      ", "
-    )}\n\nHashtags: ${seoData.hashtags.join(" ")}`;
+  const saveSEO = async () => {
+    if (!seoData) {
+      toast({
+        title: "Nothing to save 😅",
+        description: "Generate an SEO strategy before trying to save it.",
+      });
+      return;
+    }
 
-    const newItem = {
-      id: Date.now().toString(),
-      type: "seo",
-      title: contentTitle || "Generated SEO",
-      content: seoContent,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      // 2. Call the backend API to save the SEO data
+      await saveSEOAPI(
+        contentTitle || "Generated SEO Strategy",
+        seoData, // Pass the structured object
+        generatedMetadata
+      );
 
-    saved.push(newItem);
-    localStorage.setItem("pixelGardenSaved", JSON.stringify(saved));
-
-    toast({
-      title: "SEO saved! 💾",
-      description: "Added to your saved dashboard.",
-    });
+      toast({
+        title: "SEO saved! ✅",
+        description: "Added to your saved dashboard.",
+      });
+    } catch (error) {
+      console.error("SEO Save Error:", error);
+      toast({
+        title: "Save Failed 🛑",
+        description:
+          error?.message || "Could not save SEO strategy. Try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -171,7 +227,10 @@ const GenerateSEO = () => {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <Label htmlFor="platform" className="text-base font-medium">
+                      <Label
+                        htmlFor="platform"
+                        className="text-base font-medium"
+                      >
                         Platform
                       </Label>
                       <Select value={platform} onValueChange={setPlatform}>
@@ -194,7 +253,7 @@ const GenerateSEO = () => {
                         htmlFor="targetKeywords"
                         className="text-base font-medium"
                       >
-                        Target Keywords
+                        Target Keywords (comma-separated)
                       </Label>
                       <Input
                         id="targetKeywords"
@@ -269,47 +328,16 @@ const GenerateSEO = () => {
                   <CardContent className="space-y-4">
                     <div className="p-4 rounded-lg bg-muted/30 shadow-soft">
                       <Label className="text-sm font-semibold mb-2 block">
-                        Title
-                      </Label>
-                      <p className="font-medium">{seoData.title.optimized}</p>
-                    </div>
-
-                    <div className="p-4 rounded-lg bg-muted/30 shadow-soft">
-                      <Label className="text-sm font-semibold mb-2 block">
-                        Description
-                      </Label>
-                      <p className="text-sm">{seoData.description}</p>
-                    </div>
-
-                    <div className="p-4 rounded-lg bg-muted/30 shadow-soft">
-                      <Label className="text-sm font-semibold mb-2 block">
-                        Keywords
-                      </Label>
-                      <div className="flex flex-wrap gap-2">
-                        {seoData.keywords.primary.map((keyword, index) => (
-                          <Badge
-                            key={index}
-                            className="bg-growth-seed text-primary"
-                          >
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="p-4 rounded-lg bg-muted/30 shadow-soft">
-                      <Label className="text-sm font-semibold mb-2 block">
                         Hashtags
                       </Label>
                       <div className="flex flex-wrap gap-2">
+                        {/* Note: In a real app, you might want to provide a single copy button for all hashtags */}
                         {seoData.hashtags.map((hashtag, index) => (
                           <Badge
                             key={index}
                             variant="outline"
                             className="cursor-pointer"
-                            onClick={() =>
-                              copyToClipboard(hashtag, "Hashtag")
-                            }
+                            onClick={() => copyToClipboard(hashtag, "Hashtag")}
                           >
                             {hashtag}
                           </Badge>

@@ -7,6 +7,8 @@ import { Sprout, Mail, Lock, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { logIn } from "@/apiCalls/authCalls.js";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
 
 const Login = () => {
@@ -15,35 +17,30 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useContext(AuthContext);
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    const user = {
-      email,
-      password
-    }
-
-    // Simulate login process
-    try {
-      const data = await logIn(user);
-      toast({
-        title: "Welcome back to your garden! 🌱",
-        description: "Ready to nurture some amazing content today?",
-      });
-      navigate("/garden");
-    } catch (error) {
-      toast({
-        title: "Login failed",
-        description: error.message || error || "Invalid credentials",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    await login({ email, password }); // ✅ updates isAuthenticated in context
+    toast({
+      title: "Welcome back to your garden! 🌱",
+      description: "Ready to nurture some amazing content today?",
+    });
+    navigate("/garden"); // redirect after context updates
+  } catch (error) {
+    toast({
+      title: "Login failed",
+      description: error.message || error || "Invalid credentials",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
  
 
   return (

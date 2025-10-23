@@ -1,35 +1,43 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const ideaSchema = new mongoose.Schema({
+const ideaSchema = new mongoose.Schema(
+  {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     title: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     description: {
-        type: String,
-        default: "",
+      type: String,
+      default: "",
+    },
+    status: {
+      type: String,
+      enum: ["saved", "planted"], // Restrict to these two values
+      default: "saved", // Default to 'saved' when created from the generator/manual creation
     },
     currentStage: {
-        type: Number,
-        default: 0, // 0: Idea, 1: Script, 2: Video, 3: Editing, 4: SEO
-        min: 0,
-        max: 4,
+      type: Number,
+      default: 0, // 0: Idea, 1: Script, 2: Video, 3: Editing, 4: SEO
+      min: 0,
+      max: 4,
     },
     topic: {
-        type: String,
-        default: "",
+      type: String,
+      default: "",
     },
     audience: {
-        type: String,
-        default: "",
+      type: String,
+      default: "",
     },
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
-const Idea = mongoose.model('Idea', ideaSchema);
+const Idea = mongoose.model("Idea", ideaSchema);
 
 export default Idea;

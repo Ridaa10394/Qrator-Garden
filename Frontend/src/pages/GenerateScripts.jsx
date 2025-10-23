@@ -9,84 +9,64 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, Wand2, RefreshCw, Copy, Download, Save } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+// Import the new API function
+import { generateScript as generateScriptAPI, saveScript as saveScriptAPI } from "@/apiCalls/scriptAPI"; 
+
+
 
 const GenerateScripts = () => {
   const { toast } = useToast();
   const [title, setTitle] = useState("");
   const [contentType, setContentType] = useState("");
-  const [duration, setDuration] = useState("");
+  const [duration, setDuration] = useState("5"); // Default duration to 5
   const [keyPoints, setKeyPoints] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedScript, setGeneratedScript] = useState("");
-
-  const handleGenerate = () => {
-    if (!title.trim() || !contentType) {
+  // State to hold the content type and duration used for the generated script (for saving metadata)
+  const [generatedMetadata, setGeneratedMetadata] = useState(null); 
+  
+  // Handled logic for the button click
+  const handleGenerate = async () => {
+    if (!title.trim() || !contentType || !duration) {
       toast({
         title: "Details needed 🌱",
-        description: "Please fill in the title and content type to generate a script.",
+        description: "Please fill in the title, content type, and duration to generate a script.",
         variant: "destructive",
       });
       return;
     }
 
     setIsGenerating(true);
+    setGeneratedScript("");
+    setGeneratedMetadata(null); // Clear previous metadata
 
-    setTimeout(() => {
-      const script = `# ${title}
-
-## Introduction (0:00 - 0:30)
-Hey everyone! Welcome back to my channel. Today we're diving into "${title}" - something I'm really excited to share with you because [personal connection/hook].
-
-If you're new here, I create content about [your niche] to help you [main benefit]. Make sure to subscribe and hit that notification bell!
-
-## Main Content (0:30 - ${duration ? `${parseInt(duration) - 1}:00` : "4:00"})
-
-### Key Point 1: [First Major Point]
-${keyPoints.split('\n')[0] || "Let's start with the fundamentals..."}
-
-[Explain with examples, visuals, or demonstrations]
-
-### Key Point 2: [Second Major Point] 
-${keyPoints.split('\n')[1] || "Moving on to the next important aspect..."}
-
-[Provide actionable tips or step-by-step guidance]
-
-### Key Point 3: [Third Major Point]
-${keyPoints.split('\n')[2] || "Finally, let's talk about..."}
-
-[Share personal experience or case study]
-
-## Conclusion (${duration ? `${parseInt(duration) - 1}:00` : "4:00"} - ${duration || "5:00"})
-So there you have it - everything you need to know about "${title}". 
-
-The key takeaways are:
-1. [First takeaway]
-2. [Second takeaway] 
-3. [Third takeaway]
-
-What's your experience with this topic? Let me know in the comments below! If this video helped you, please give it a thumbs up and consider subscribing for more content like this.
-
-Next week, I'll be covering [related topic], so make sure you're subscribed to catch that. Until then, keep creating amazing content!
-
----
-
-## Call-to-Action Notes:
-- Subscribe button appears at [timestamp]
-- End screen promotes [related video/playlist]
-- Pin comment asking engaging question
-- Description includes relevant links and timestamps`;
-
-      setGeneratedScript(script);
-      setIsGenerating(false);
+    try {
+      // 1. Call the backend API to generate the script
+      const scriptText = await generateScriptAPI(title, contentType, duration, keyPoints);
+      
+      setGeneratedScript(scriptText);
+      // Save metadata related to this specific generated content
+      setGeneratedMetadata({ contentType, duration: parseInt(duration) });
 
       toast({
         title: "Script ready! 📝",
         description: "Your content script has been generated and is ready to use.",
       });
-    }, 3000);
+
+    } catch (error) {
+      console.error("Script Generation Error:", error);
+      toast({
+        title: "Generation Failed 🛑",
+        description: error?.message || "Could not generate script. Please check your connection.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyScript = () => {
+    if (!generatedScript) return;
     navigator.clipboard.writeText(generatedScript);
     toast({
       title: "Copied to clipboard! 📋",
@@ -95,6 +75,7 @@ Next week, I'll be covering [related topic], so make sure you're subscribed to c
   };
 
   const downloadScript = () => {
+    if (!generatedScript) return;
     const element = document.createElement("a");
     const file = new Blob([generatedScript], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
@@ -109,23 +90,37 @@ Next week, I'll be covering [related topic], so make sure you're subscribed to c
     });
   };
 
-  const saveScript = () => {
-    const saved = JSON.parse(localStorage.getItem("pixelGardenSaved") || "[]");
-    const newItem = {
-      id: Date.now().toString(),
-      type: "script",
-      title: title || "Generated Script",
-      content: generatedScript,
-      createdAt: new Date().toISOString(),
-    };
+  // Handled logic for saving to the database
+  const saveScript = async () => {
+    if (!generatedScript) {
+      toast({
+        title: "Nothing to save 😅",
+        description: "Generate a script before trying to save it.",
+      });
+      return;
+    }
 
-    saved.push(newItem);
-    localStorage.setItem("pixelGardenSaved", JSON.stringify(saved));
+    try {
+      // 2. Call the backend API to save the script to the database
+      await saveScriptAPI(
+        title || "Generated Script",
+        generatedScript,
+        generatedMetadata // Pass the saved metadata
+      );
 
-    toast({
-      title: "Script saved! 💾",
-      description: "Added to your saved dashboard.",
-    });
+      toast({
+        title: "Script saved! ✅",
+        description: "Added to your saved dashboard.",
+      });
+      
+    } catch (error) {
+      console.error("Script Save Error:", error);
+      toast({
+        title: "Save Failed 🛑",
+        description: error?.message || "Could not save script. Try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -288,12 +283,14 @@ Next week, I'll be covering [related topic], so make sure you're subscribed to c
                     </div>
 
                     <div className="mt-6 flex flex-wrap gap-2">
-                      <Badge className="bg-growth-seed text-primary shadow-soft">
-                        {contentType.charAt(0).toUpperCase() + contentType.slice(1)}
-                      </Badge>
-                      {duration && (
+                      {generatedMetadata && generatedMetadata.contentType && (
+                          <Badge className="bg-growth-seed text-primary shadow-soft">
+                            {generatedMetadata.contentType.charAt(0).toUpperCase() + generatedMetadata.contentType.slice(1)}
+                          </Badge>
+                      )}
+                      {generatedMetadata && generatedMetadata.duration && (
                         <Badge className="bg-growth-sprout text-primary shadow-soft">
-                          {duration} minutes
+                          {generatedMetadata.duration} minutes
                         </Badge>
                       )}
                       <Badge className="bg-growth-sapling text-primary shadow-soft">
