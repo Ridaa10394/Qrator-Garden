@@ -27,7 +27,7 @@ connectDB();
 app.use(express.json());
 app.use(cookieparser());
 app.use(cors({
-  origin: 'https://qrator-garden.netlify.app/',
+  origin: 'https://qrator-garden.netlify.app',
   credentials: true
 }
 ))
