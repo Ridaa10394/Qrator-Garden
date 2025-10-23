@@ -27,8 +27,8 @@ connectDB();
 //middleware
 app.use(express.json());
 app.use(cookieparser());
-// Allow the frontend origin (set FRONTEND_URL in production .env). Default to local dev origin.
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+const FRONTEND_URL = 'https://qrator-garden.netlify.app';
 app.use(cors({
 
 
