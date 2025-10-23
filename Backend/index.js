@@ -27,7 +27,7 @@ connectDB();
 app.use(express.json());
 app.use(cookieparser());
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://qrator-garden.netlify.app/',
   credentials: true
 }
 ))
@@ -49,5 +49,5 @@ app.get('/', (req, res) => {
 
 //start server
 app.listen(PORT, () => {
-  console.log(`Server is running on https://qrator-garden.netlify.app/`);
+  console.log(`Server is running on ${PORT}`);
 });
