@@ -49,5 +49,5 @@ app.get('/', (req, res) => {
 
 //start server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on https://qrator-garden.netlify.app/`);
 });
