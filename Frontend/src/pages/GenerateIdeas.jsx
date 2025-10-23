@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Lightbulb, Sparkles, RefreshCw, Copy, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { createIdea,generateIdeas } from "@/apiCalls/ideaAPI";
+import { createIdea, generateIdeas } from "@/apiCalls/ideaAPI";
 
 const GenerateIdeas = () => {
   const { toast } = useToast();
@@ -70,7 +70,7 @@ const GenerateIdeas = () => {
         variant: "destructive",
       });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-earth">
@@ -169,7 +169,30 @@ const GenerateIdeas = () => {
                         className="p-4 rounded-lg bg-card shadow-soft border"
                       >
                         <Badge className="mb-2">Idea #{index + 1}</Badge>
-                        <p className="text-sm mb-3">{idea}</p>
+
+                        {/* CRITICAL FIX: Explicitly check and display the title and description */}
+                        {idea.title && (
+                          <h3 className="text-lg font-semibold mb-1 text-green-700">
+                            {idea.title}
+                          </h3>
+                        )}
+                        {idea.description && (
+                          <p className="text-sm mb-3 text-gray-700">
+                            {idea.description}
+                          </p>
+                        )}
+
+                        {/* Fallback in case only one property (e.g., description) came through, 
+        which might happen if parsing fails partially. */}
+                        {!idea.title && !idea.description && (
+                          <p className="text-sm mb-3 text-gray-700">
+                            {typeof idea === "string"
+                              ? idea
+                              : JSON.stringify(idea)}
+                          </p>
+                        )}
+
+                        {/* Ensure copyIdea and saveIdea receive the full object */}
                         <div className="flex gap-2">
                           <Button
                             variant="ghost"

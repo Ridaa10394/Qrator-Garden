@@ -11,7 +11,7 @@ const axiosy = axios.create({
 export const generateIdeas = async (topic, audience) => {
   try {
     const response = await axiosy.post("/api/ideas/generate", { topic, audience });
-    return response.data; // array of ideas
+    return response.data.generatedIdeas || []; // array of ideas
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }

@@ -174,7 +174,7 @@ function parseIdeasFromText(text) {
         });
     }
     
-    return ideas.slice(0, 5); // Ensure we return exactly 5 ideas
+    return ideas.slice(0, 3); // Ensure we return exactly 5 ideas
 }
 
 // Helper function to parse SEO data from Gemini response

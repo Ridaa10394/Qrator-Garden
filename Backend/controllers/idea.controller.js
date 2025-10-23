@@ -14,23 +14,8 @@ export const generateIdeas = async (req, res) => {
         // Generate 5 ideas using Gemini
         const generatedIdeas = await generateIdeasWithGemini(topic, audience);
 
-        // Save all generated ideas to database
-        const savedIdeas = await Promise.all(
-            generatedIdeas.map(idea => 
-                Idea.create({
-                    userId,
-                    title: idea.title,
-                    description: idea.description,
-                    topic,
-                    audience: audience || "",
-                    currentStage: 0
-                })
-            )
-        );
-
         return res.status(201).json({
             message: "Ideas generated successfully",
-            ideas: savedIdeas,
             generatedIdeas: generatedIdeas // Raw ideas for immediate display
         });
     } catch (error) {
