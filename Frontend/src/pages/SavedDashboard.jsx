@@ -1,3 +1,4 @@
+// Frontend/src/pages/SavedDashboard.jsx
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -12,26 +13,50 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Lightbulb, FileText, Search, Trash2, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navigation from "@/components/Navigation";
+import { getSavedContent, deleteSavedContent } from "@/apiCalls/savedAPI";
 
 const SavedDashboard = () => {
   const [savedItems, setSavedItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const saved = localStorage.getItem("pixelGardenSaved");
-    if (saved) {
-      setSavedItems(JSON.parse(saved));
-    }
+    fetchSavedContent();
   }, []);
 
-  const deleteItem = (id) => {
-    const updated = savedItems.filter((item) => item.id !== id);
-    setSavedItems(updated);
-    localStorage.setItem("pixelGardenSaved", JSON.stringify(updated));
-    toast({
-      title: "Item deleted",
-      description: "Successfully removed from saved items",
-    });
+  const fetchSavedContent = async () => {
+    setIsLoading(true);
+    try {
+      const content = await getSavedContent();
+      setSavedItems(content);
+    } catch (error) {
+      console.error("Error fetching saved content:", error);
+      toast({
+        title: "Failed to load content",
+        description: error.message || "Could not load saved content",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteItem = async (id) => {
+    try {
+      await deleteSavedContent(id);
+      setSavedItems(savedItems.filter((item) => item._id !== id));
+      toast({
+        title: "Item deleted",
+        description: "Successfully removed from saved items",
+      });
+    } catch (error) {
+      console.error("Error deleting content:", error);
+      toast({
+        title: "Failed to delete",
+        description: error.message || "Could not delete item",
+        variant: "destructive",
+      });
+    }
   };
 
   const copyContent = (content) => {
@@ -46,7 +71,11 @@ const SavedDashboard = () => {
 
   const renderItems = (items) => (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {items.length === 0 ? (
+      {isLoading ? (
+        <div className="col-span-full text-center py-12">
+          <div className="text-muted-foreground">Loading saved content...</div>
+        </div>
+      ) : items.length === 0 ? (
         <div className="col-span-full text-center py-12">
           <div className="text-muted-foreground">No saved items yet</div>
           <div className="text-sm text-muted-foreground mt-2">
@@ -56,7 +85,7 @@ const SavedDashboard = () => {
       ) : (
         items.map((item) => (
           <Card
-            key={item.id}
+            key={item._id}
             className="hover:shadow-soft transition-all border-border/50"
           >
             <CardHeader className="pb-3">
@@ -76,7 +105,7 @@ const SavedDashboard = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => deleteItem(item.id)}
+                    onClick={() => deleteItem(item._id)}
                     className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
                   >
                     <Trash2 className="h-3 w-3" />

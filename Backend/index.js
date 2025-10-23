@@ -11,6 +11,8 @@ import userRouter from './routes/user.routes.js';
 import cookieparser from 'cookie-parser';
 import cors from 'cors';
 import Idearouter from './routes/idea.routes.js';
+import calendarRouter from './routes/calendar.routes.js';
+import savedRouter from './routes/saved.routes.js';
 
 const app = express();
 const PORT = 8000;
@@ -30,7 +32,9 @@ app.use(cors({
 //Routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
-app.use("/api/ideas",Idearouter)
+app.use("/api/ideas",Idearouter);
+app.use("/api/calendar",calendarRouter);
+app.use("/api/saved",savedRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

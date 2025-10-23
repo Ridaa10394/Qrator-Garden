@@ -4,9 +4,11 @@ import {
   createIdea,
   getAllIdeas,
   updateIdeaStage,
-  deleteIdea
+  deleteIdea,
+  getUserStats
 } from '../controllers/idea.controller.js';
 import { isAuth } from '../middlewares/isAuth.js';
+
 
 const Idearouter = express.Router();
 
@@ -18,5 +20,5 @@ Idearouter.get('/getideas', getAllIdeas);
 Idearouter.post('/createidea', createIdea);
 Idearouter.patch('/:id/stage', updateIdeaStage);
 Idearouter.delete('/:id', deleteIdea);
-
+Idearouter.get('/stats',getUserStats)
 export default Idearouter;

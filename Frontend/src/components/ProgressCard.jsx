@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Circle, Sprout, TreePine, Flower, Trophy } from "lucide-react";
+import { Circle, Sprout, TreePine, Flower, Trophy, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const stages = [
@@ -14,7 +14,7 @@ const stages = [
   { name: "SEO", icon: Trophy, color: "bg-growth-harvest", description: "Ready to harvest" },
 ];
 
-const ProgressCard = ({ idea, onStageUpdate }) => {
+const ProgressCard = ({ idea, onStageUpdate, onDelete }) => {
   const [isAdvancing, setIsAdvancing] = useState(false);
 
   const handleAdvanceStage = () => {
@@ -27,6 +27,12 @@ const ProgressCard = ({ idea, onStageUpdate }) => {
     }
   };
 
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete "${idea.title}"?`)) {
+      onDelete(idea.id);
+    }
+  };
+
   const currentStageData = stages[idea.currentStage];
   const CurrentIcon = currentStageData.icon;
   const progressPercentage = ((idea.currentStage + 1) / stages.length) * 100;
@@ -35,7 +41,7 @@ const ProgressCard = ({ idea, onStageUpdate }) => {
     <Card className="shadow-soft hover:shadow-medium transition-all border-0 bg-card/50 backdrop-blur aspect-square flex flex-col">
       <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <div
               className={cn(
                 "p-3 rounded-full shadow-soft transition-all",
@@ -45,14 +51,24 @@ const ProgressCard = ({ idea, onStageUpdate }) => {
             >
               <CurrentIcon className="w-5 h-5 text-primary" />
             </div>
-            <div>
+            <div className="flex-1">
               <CardTitle className="text-lg leading-tight">{idea.title}</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">{idea.description}</p>
             </div>
           </div>
-          <Badge variant="secondary" className="shrink-0">
-            {currentStageData.name}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="shrink-0">
+              {currentStageData.name}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDelete}
+              className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 

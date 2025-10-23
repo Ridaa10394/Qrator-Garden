@@ -1,4 +1,5 @@
-import { useState } from "react";
+// Frontend/src/components/ContentCalender.jsx
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,16 +7,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Calendar as CalendarIcon, Clock, FileText } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, Clock, FileText, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import {
+  createCalendarEvent,
+  getCalendarEvents,
+  deleteCalendarEvent,
+} from "@/apiCalls/calendarAPI";
 
 const ContentCalendar = () => {
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState();
   const [events, setEvents] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
   const [eventDetails, setEventDetails] = useState("");
   const [eventTime, setEventTime] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const colorStages = [
     "bg-growth-seed",
@@ -25,6 +34,30 @@ const ContentCalendar = () => {
     "bg-growth-harvest",
   ];
 
+  // Fetch events on component mount
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    try {
+      const fetchedEvents = await getCalendarEvents();
+      // Convert date strings back to Date objects
+      const parsedEvents = fetchedEvents.map(event => ({
+        ...event,
+        date: new Date(event.date),
+      }));
+      setEvents(parsedEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      toast({
+        title: "Failed to load events",
+        description: error.message || "Could not load calendar events",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleDateClick = (date) => {
     if (date) {
       setSelectedDate(date);
@@ -32,22 +65,61 @@ const ContentCalendar = () => {
     }
   };
 
-  const handleEventSave = () => {
+  const handleEventSave = async () => {
     if (eventTitle && selectedDate) {
-      const newEvent = {
-        id: Date.now().toString(),
-        date: selectedDate,
-        title: eventTitle,
-        details: eventDetails,
-        time: eventTime,
-        colorStage: Math.floor(Math.random() * colorStages.length),
-      };
+      setIsLoading(true);
+      try {
+        const newEvent = {
+          title: eventTitle,
+          date: selectedDate.toISOString(),
+          time: eventTime,
+          details: eventDetails,
+          colorStage: Math.floor(Math.random() * colorStages.length),
+        };
 
-      setEvents([...events, newEvent]);
-      setEventTitle("");
-      setEventDetails("");
-      setEventTime("");
-      setIsDialogOpen(false);
+        const savedEvent = await createCalendarEvent(newEvent);
+        
+        // Add to local state with parsed date
+        setEvents([...events, { ...savedEvent.event, date: new Date(savedEvent.event.date) }]);
+        
+        setEventTitle("");
+        setEventDetails("");
+        setEventTime("");
+        setIsDialogOpen(false);
+
+        toast({
+          title: "Event planted! 🌱",
+          description: "Your content event has been added to the calendar.",
+        });
+      } catch (error) {
+        console.error("Error creating event:", error);
+        toast({
+          title: "Failed to create event",
+          description: error.message || "Could not create calendar event",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    try {
+      await deleteCalendarEvent(eventId);
+      setEvents(events.filter(event => event._id !== eventId));
+      
+      toast({
+        title: "Event removed",
+        description: "Calendar event has been deleted.",
+      });
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast({
+        title: "Failed to delete event",
+        description: error.message || "Could not delete event",
+        variant: "destructive",
+      });
     }
   };
 
@@ -58,14 +130,6 @@ const ContentCalendar = () => {
   };
 
   const hasEvents = (date) => getEventsForDate(date).length > 0;
-
-  const getDateColor = (date) => {
-    const eventsForDate = getEventsForDate(date);
-    if (eventsForDate.length > 0) {
-      return colorStages[eventsForDate[0].colorStage];
-    }
-    return "";
-  };
 
   return (
     <div className="space-y-6">
@@ -143,9 +207,9 @@ const ContentCalendar = () => {
                 <Button
                   onClick={handleEventSave}
                   className="w-full shadow-medium"
-                  disabled={!eventTitle}
+                  disabled={!eventTitle || isLoading}
                 >
-                  Plant in Calendar
+                  {isLoading ? "Planting..." : "Plant in Calendar"}
                 </Button>
               </div>
             </DialogContent>
@@ -159,23 +223,33 @@ const ContentCalendar = () => {
           <CardHeader>
             <CardTitle className="text-lg">Planted Events</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 ">
             {events.map((event) => (
               <div
-                key={event.id}
-                className={cn("p-4 rounded-lg shadow-soft", colorStages[event.colorStage])}
+                key={event._id}
+                className={cn("p-4 rounded-lg shadow-soft text-white bg-green-800")}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-primary">{event.title}</h4>
-                  <span className="text-sm text-primary/70">
-                    {event.date.toLocaleDateString()}
-                  </span>
+                <div className="flex justify-between items-start mb-2 ">
+                  <h4 className="font-semibold text-primary text-white">{event.title}</h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-primary/70 text-white">
+                      {event.date.toLocaleDateString()}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => handleDeleteEvent(event._id)}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
                 </div>
                 {event.time && (
-                  <p className="text-sm text-primary/80 mb-1">⏰ {event.time}</p>
+                  <p className="text-sm text-primary/80 mb-1 text-white">⏰ {event.time}</p>
                 )}
                 {event.details && (
-                  <p className="text-sm text-primary/70">{event.details}</p>
+                  <p className="text-sm text-primary/70 text-white">{event.details}</p>
                 )}
               </div>
             ))}
