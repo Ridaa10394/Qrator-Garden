@@ -18,7 +18,7 @@ import savedRouter from './routes/saved.routes.js';
 import ProfileRouter from './routes/profile.routes.js';
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 //connect to database
 connectDB();
