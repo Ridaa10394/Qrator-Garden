@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Lightbulb, Sparkles, RefreshCw, Copy, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { createIdea, generateIdeas } from "@/apiCalls/ideaAPI";
+import { generateIdeas } from "@/apiCalls/ideaAPI";
+import { createSavedContent } from "@/apiCalls/savedAPI";
 
 const GenerateIdeas = () => {
   const { toast } = useToast();
@@ -56,17 +57,24 @@ const GenerateIdeas = () => {
 
   const saveIdea = async (idea) => {
     try {
-      // Save to backend DB
-      await createIdea(idea);
+      // Save generated idea into SavedContent collection so it appears in SavedDashboard
+      const payload = {
+        type: "idea",
+        title: idea.title || (typeof idea === "string" ? idea : "Generated Idea"),
+        content: idea.description || idea.title || (typeof idea === "string" ? idea : JSON.stringify(idea)),
+      };
+
+      await createSavedContent(payload);
 
       toast({
         title: "Idea saved! 💾",
         description: "Added to your saved dashboard.",
       });
     } catch (err) {
+      console.error("Save idea error:", err);
       toast({
-        title: "Idea already exists ⚠️",
-        description: err.message || "This idea is already in your dashboard.",
+        title: "Save failed ⚠️",
+        description: err.message || "Could not save idea.",
         variant: "destructive",
       });
     }

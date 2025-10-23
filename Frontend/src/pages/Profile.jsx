@@ -1,48 +1,72 @@
-import React, { useState } from "react";
-import Navigation from "@/components/Navigation.jsx"
+import React, { useState, useEffect, useContext } from "react";
+import Navigation from "@/components/Navigation.jsx";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import {
-  User,
-  Mail,
-  MapPin,
-  Calendar,
-  Edit3,
-  Save,
-  Sprout,
-  Trophy,
-  Target,
-} from "lucide-react";
+import { User, Mail, Edit3, Save, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast.js";
+import { getProfile, updateProfile } from "@/apiCalls/profileAPI.js";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "@/context/AuthContext.jsx";
 
 const Profile = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { logout } = useContext(AuthContext); // ✅ Use AuthContext for logout
+
+  const [profile, setProfile] = useState({ name: "", email: "", bio: "" });
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
-    name: "Creative Gardener",
-    email: "gardener@pixelgarden.com",
-    bio: "Passionate content creator who loves nurturing ideas from tiny seeds into amazing content. Pixel art enthusiast and garden lover! 🌱",
-    
-  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  const stats = [
-    { label: "Ideas Planted", value: "23", icon: Sprout, color: "text-growth-seed" },
-    { label: "Content Harvested", value: "12", icon: Trophy, color: "text-growth-harvest" },
-    { label: "Days Streaking", value: "7", icon: Target, color: "text-primary" },
-  ];
 
-  const handleSave = () => {
-    setIsEditing(false);
-    toast({
-      title: "Profile updated! 🌿",
-      description: "Your garden profile has been successfully updated.",
-    });
+  // Fetch profile from backend
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const user = await getProfile();
+        setProfile(user);
+      } catch (error) {
+        toast({
+          title: "Error fetching profile",
+          description: error.message || "Could not fetch profile",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [toast]);
+
+  // Save profile edits
+  const handleSave = async () => {
+    try {
+      const updatedUser = await updateProfile(profile);
+      setProfile(updatedUser);
+      setIsEditing(false);
+      toast({
+        title: "Profile updated! 🌿",
+        description: "Your garden profile has been successfully updated.",
+      });
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: error.message || "Could not update profile",
+        variant: "destructive",
+      });
+    }
   };
+
+  // Logout using AuthContext
+  const handleLogout = () => {
+    logout(); // Updates AuthContext and sets isAuthenticated = false
+    navigate("/login"); // Redirect to login page
+  };
+
+  if (isLoading) return <div>Loading profile...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-earth">
@@ -51,13 +75,23 @@ const Profile = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Your Garden Profile 🌻
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your creative space and track your growth journey
-            </p>
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Your Garden Profile 🌻
+              </h1>
+              <p className="text-muted-foreground">
+                Manage your creative space and track your growth journey
+              </p>
+            </div>
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
           </div>
 
           {/* Profile Card */}
@@ -147,52 +181,29 @@ const Profile = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label htmlFor="bio">MOTO</Label>
                     {isEditing ? (
                       <Textarea
-                        id="bio"
-                        value={profile.bio}
+                        id="moto"
+                        value={profile.moto}
                         onChange={(e) =>
-                          setProfile({ ...profile, bio: e.target.value })
+                          setProfile({ ...profile, moto: e.target.value })
                         }
                         className="shadow-soft resize-none"
                         rows={3}
                       />
                     ) : (
                       <p className="text-muted-foreground leading-relaxed">
-                        {profile.bio}
+                        {profile.moto}
                       </p>
                     )}
                   </div>
-
-                  
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Stats Cards */}
-          <div className="grid md:grid-cols-3 gap-6">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <Card
-                  key={stat.label}
-                  className="shadow-soft border-0 bg-card/50 backdrop-blur"
-                >
-                  <CardContent className="p-6 text-center">
-                    <Icon className={`w-8 h-8 mx-auto mb-3 ${stat.color}`} />
-                    <div className="text-3xl font-bold text-foreground mb-1">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {stat.label}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+          
         </div>
       </div>
     </div>

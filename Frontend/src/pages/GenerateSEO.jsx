@@ -16,10 +16,8 @@ import { Search, Target, RefreshCw, Save, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 // Import the new API functions (path points to apiCalls folder)
-import {
-  generateSEO as generateSEOAPI,
-  saveSEO as saveSEOAPI,
-} from "@/apiCalls/seoAPI";
+import { generateSEO as generateSEOAPI } from "@/apiCalls/seoAPI";
+import { createSavedContent } from "@/apiCalls/savedAPI";
 
 // Utility function to safely parse the SEO data object
 const parseSeoData = (dataString) => {
@@ -156,12 +154,13 @@ const GenerateSEO = () => {
     }
 
     try {
-      // 2. Call the backend API to save the SEO data
-      await saveSEOAPI(
-        contentTitle || "Generated SEO Strategy",
-        seoData, // Pass the structured object
-        generatedMetadata
-      );
+      const payload = {
+        type: "seo",
+        title: contentTitle || "Generated SEO Strategy",
+        content: JSON.stringify(seoData),
+      };
+
+      await createSavedContent(payload);
 
       toast({
         title: "SEO saved! ✅",

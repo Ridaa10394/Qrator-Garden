@@ -10,7 +10,8 @@ import { FileText, Wand2, RefreshCw, Copy, Download, Save } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 // Import the new API function
-import { generateScript as generateScriptAPI, saveScript as saveScriptAPI } from "@/apiCalls/scriptAPI"; 
+import { generateScript as generateScriptAPI } from "@/apiCalls/scriptAPI"; 
+import { createSavedContent } from "@/apiCalls/savedAPI";
 
 
 
@@ -101,18 +102,18 @@ const GenerateScripts = () => {
     }
 
     try {
-      // 2. Call the backend API to save the script to the database
-      await saveScriptAPI(
-        title || "Generated Script",
-        generatedScript,
-        generatedMetadata // Pass the saved metadata
-      );
+      const payload = {
+        type: "script",
+        title: title || "Generated Script",
+        content: generatedScript,
+      };
+
+      await createSavedContent(payload);
 
       toast({
         title: "Script saved! ✅",
         description: "Added to your saved dashboard.",
       });
-      
     } catch (error) {
       console.error("Script Save Error:", error);
       toast({

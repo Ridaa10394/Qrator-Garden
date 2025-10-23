@@ -15,6 +15,7 @@ import Idearouter from './routes/idea.routes.js';
 import ScriptRouter from './routes/script.route.js';
 import calendarRouter from './routes/calendar.routes.js';
 import savedRouter from './routes/saved.routes.js';
+import ProfileRouter from './routes/profile.routes.js';
 
 const app = express();
 const PORT = 8000;
@@ -39,6 +40,7 @@ app.use('/api/seo', SEORouter);
 app.use("/api/script",ScriptRouter);
 app.use("/api/calendar",calendarRouter);
 app.use("/api/saved",savedRouter);
+app.use("/api/profile",ProfileRouter);
 
 
 app.get('/', (req, res) => {
