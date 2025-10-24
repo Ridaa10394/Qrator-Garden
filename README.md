@@ -1,17 +1,17 @@
 # 🌿 Qrator Garden
 
-> **“An AI-powered planner that helps creators nurture their ideas into full-fledged content.”**
+> **AI meets creativity: plan, write, and optimize your next big video idea.**
 
 ---
 
-## 🌱 About Qrator Garden
+## 🌱 **About Qrator Garden**
 
 **Qrator Garden** is a creative companion built to help content creators plan, write, and optimize their ideas — from the first spark to the final upload.  
 Inspired by a dream to build an app where AI supports, not replaces, creativity — Qrator Garden acts as your digital garden, where ideas are planted, nurtured, and harvested once they’ve grown into fully developed videos.
 
 ---
 
-## ✨ Key Features
+## ✨ **Key Features**
 
 - 🌱 **Plant & Grow Ideas** – Start by planting an idea you’re working on and track its growth through different stages.  
 - 🧠 **AI-Powered Idea Generation** – Get fresh, personalized ideas using the **Gemini API**.  
@@ -23,7 +23,7 @@ Inspired by a dream to build an app where AI supports, not replaces, creativity 
 
 ---
 
-## 🪴 The Creative Growth Journey
+## 🪴 **The Creative Growth Journey**
 
 Each idea in Qrator Garden follows a growth path:
 
@@ -38,7 +38,7 @@ Each idea in Qrator Garden follows a growth path:
 
 ---
 
-## 🧰 Tech Stack
+## 🧰 **Tech Stack**
 
 | Layer | Technologies |
 |--------|--------------|
@@ -57,57 +57,49 @@ Each idea in Qrator Garden follows a growth path:
 ```bash
 git clone https://github.com/your-username/Qrator-Garden.git
 cd Qrator-Garden
+2️⃣ Install Dependencies
+Frontend:
 
-### **2️⃣ Install Dependencies**
-
-**Frontend:**
-
+bash
+Copy code
 cd Frontend
 npm install
+Backend:
 
-**Backend:**
-
+bash
+Copy code
 cd ../Backend
 npm install
-
 3️⃣ Run the App
-
 Start the backend:
 
+bash
+Copy code
 npm run dev
-
 Start the frontend:
 
+bash
+Copy code
 npm run dev
-
----
-
 🌐 Live Demo
-
-🔗 https://qrator-garden.netlify.app (Frontend on Netlify)
-
-🖥️ https://qrator-garden.onrender.com (Render)
-
----
+🔗 Frontend on Netlify
+🖥️ Backend API on Render
 
 🧩 Folder Structure
+bash
+Copy code
 Qrator-Garden/
 ├── Frontend/        # React + shadcn + Tailwind UI
 ├── Backend/         # Express + MongoDB + Gemini API integration
 └── README.md
+📅 Future Enhancements
+🎨 Add thumbnail generation and media asset suggestions
 
----
+🔔 Enable progress reminders for upcoming content
 
-📅 **Future Enhancements**
-
-🎨 **Add thumbnail generation and media asset suggestions
-
-📊 **Include analytics for content performance tracking**
-
----
+📊 Include analytics for content performance tracking
 
 💖 Credits
-
 Made with ❤️ for content creators by Ridaa Mahrooz Mirza
 
 Let your ideas grow, bloom, and inspire 🌻
