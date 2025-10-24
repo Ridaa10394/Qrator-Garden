@@ -16,7 +16,7 @@ Inspired by a dream to build an app where AI supports, not replaces, creativity 
 
 - 🌱 **Plant & Grow Ideas** – Start by planting an idea you're working on and track its growth through different stages.
 - 🧠 **AI-Powered Idea Generation** – Get fresh, personalized ideas using the **Gemini API**.
-- ✍️ **Script Generation** – Generate and refine video scripts tailored to your tone and content style.
+- ✍️ **Script Generation** – Generate video scripts tailored to your tone and content style and preffered language.
 - 🔍 **SEO Optimization** – Receive keyword suggestions and SEO-friendly titles for better discoverability.
 - 📆 **Content Calendar & Planner** – Organize your content pipeline and view progress cards for each idea.
 - 💾 **Saved Dashboard** – Store your ideas, scripts, and SEO drafts for later use.
