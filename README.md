@@ -8,7 +8,7 @@
 
 **Qrator Garden** is a creative companion built to help content creators plan, write, and optimize their ideas — from the first spark to the final upload.
 
-Inspired by a dream to build an app where AI supports, not replaces, creativity — Qrator Garden acts as your digital garden, where ideas are planted, nurtured, and harvested once they've grown into fully developed videos.
+Inspired by a dream (actual dream) to build an app where AI supports, not replaces, creativity — Qrator Garden acts as your digital garden, where ideas are planted, nurtured, and harvested once they've grown into fully developed videos.
 
 ---
 
