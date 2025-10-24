@@ -61,12 +61,12 @@ cd Qrator-Garden
 ### **2️⃣ Install Dependencies**
 
 **Frontend:**
-```bash
+
 cd Frontend
 npm install
 
 **Backend:**
-```bash
+
 cd ../Backend
 npm install
 
