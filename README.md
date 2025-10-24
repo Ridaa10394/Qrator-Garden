@@ -57,7 +57,7 @@ Each idea in Qrator Garden follows a growth path:
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/Qrator-Garden.git
+git clone https://github.com/Ridaa10394/Qrator-Garden.git
 cd Qrator-Garden
 ```
 
@@ -91,8 +91,8 @@ npm run dev
 
 ## 🌐 Live Demo
 
-- 🔗 [Frontend on Netlify](#)
-- 🖥️ [Backend API on Render](#)
+- 🔗 https://qrator-garden.netlify.app(#)
+- 🖥️ https://qrator-garden.onrender.com(#)
 
 ---
 
