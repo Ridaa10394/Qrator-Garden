@@ -91,8 +91,8 @@ npm run dev
 
 ## 🌐 Live Demo
 
-- 🔗 https://qrator-garden.netlify.app(#)
-- 🖥️ https://qrator-garden.onrender.com(#)
+- 🔗 https://qrator-garden.netlify.app
+- 🖥️ https://qrator-garden.onrender.com
 
 ---
 
